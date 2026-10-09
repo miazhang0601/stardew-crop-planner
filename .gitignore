@@ -1,0 +1,15 @@
+# Back end
+backend/target/
+backend/data/
+
+# Front end
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+
+# Editors and OS
+.idea/
+.vscode/
+*.iml
+.DS_Store

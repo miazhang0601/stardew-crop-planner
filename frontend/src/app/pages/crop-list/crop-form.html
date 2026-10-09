@@ -1,0 +1,71 @@
+<form class="card" [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <h3>{{ editing() ? 'Edit ' + editing()!.name : 'Add a crop' }}</h3>
+  <p class="hint">Type the numbers exactly as your game shows them.</p>
+
+  <div class="row">
+    <label>
+      Name
+      <input type="text" formControlName="name" maxlength="40" />
+      @if (form.controls.name.touched && form.controls.name.invalid) {
+        <span class="field-error">Give the crop a name.</span>
+      }
+    </label>
+    <label>
+      Seed price (g)
+      <input type="number" formControlName="seedPrice" min="0" />
+      @if (form.controls.seedPrice.invalid) {
+        <span class="field-error">0 or more.</span>
+      }
+    </label>
+    <label>
+      Sell price (g)
+      <input type="number" formControlName="sellPrice" min="0" />
+      @if (form.controls.sellPrice.invalid) {
+        <span class="field-error">0 or more.</span>
+      }
+    </label>
+  </div>
+
+  <div class="row">
+    <label>
+      Days to grow
+      <input type="number" formControlName="growthDays" min="1" max="84" />
+      @if (form.controls.growthDays.invalid) {
+        <span class="field-error">Between 1 and 84.</span>
+      }
+    </label>
+    <label>
+      Regrows every (days)
+      <input type="number" formControlName="regrowDays" min="1" max="84" placeholder="Empty if it does not regrow" />
+      @if (form.controls.regrowDays.invalid) {
+        <span class="field-error">Between 1 and 84, or empty.</span>
+      }
+    </label>
+    <label>
+      Items per harvest
+      <input type="number" formControlName="harvestYield" min="1" max="20" />
+      @if (form.controls.harvestYield.invalid) {
+        <span class="field-error">Between 1 and 20.</span>
+      }
+    </label>
+  </div>
+
+  <fieldset formGroupName="seasons">
+    <legend>Grows in</legend>
+    @for (season of seasons; track season) {
+      <label class="check"><input type="checkbox" [formControlName]="season" /> {{ labels[season] }}</label>
+    }
+    @if (form.controls.seasons.touched && form.controls.seasons.invalid) {
+      <span class="field-error">Choose at least one season.</span>
+    }
+  </fieldset>
+
+  @if (serverError(); as message) {
+    <p class="error" role="alert">{{ message }}</p>
+  }
+
+  <div class="actions">
+    <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save crop' }}</button>
+    <button type="button" class="secondary" (click)="cancelled.emit()">Cancel</button>
+  </div>
+</form>

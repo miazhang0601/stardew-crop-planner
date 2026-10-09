@@ -1,0 +1,62 @@
+<section>
+  <h2>Saved plans</h2>
+
+  @if (error(); as message) {
+    <p class="error" role="alert">{{ message }}</p>
+  }
+
+  @for (plan of plans(); track plan.id) {
+    <article class="card">
+      <header>
+        <div>
+          <h3>{{ plan.name }}</h3>
+          <p class="hint">
+            {{ labels[plan.season] }}, planted on day {{ plan.startDay }} · saved {{ plan.createdAt | date: 'mediumDate' }}
+          </p>
+        </div>
+        <button type="button" class="secondary" (click)="remove(plan)" [attr.aria-label]="'Delete ' + plan.name">
+          Delete
+        </button>
+      </header>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Crop</th>
+              <th scope="col" class="num">Tiles</th>
+              <th scope="col" class="num">Harvests</th>
+              <th scope="col" class="num">Seed cost</th>
+              <th scope="col" class="num">Revenue</th>
+              <th scope="col" class="num">Profit</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entry of plan.entries; track $index) {
+              <tr>
+                <th scope="row">{{ entry.cropName }}</th>
+                <td class="num">{{ entry.tiles }}</td>
+                <td class="num">{{ entry.harvests }}</td>
+                <td class="num">{{ entry.totalCost | number }}g</td>
+                <td class="num">{{ entry.totalRevenue | number }}g</td>
+                <td class="num" [class.negative]="entry.profit < 0">{{ entry.profit | number }}g</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row" colspan="3">Total</th>
+              <td class="num">{{ plan.totalCost | number }}g</td>
+              <td class="num">{{ plan.totalRevenue | number }}g</td>
+              <td class="num" [class.negative]="plan.totalProfit < 0">{{ plan.totalProfit | number }}g</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </article>
+  } @empty {
+    @if (!error()) {
+      <p>No plans saved yet. <a routerLink="/planner">Plan a season</a> to get started.</p>
+    }
+  }
+</section>

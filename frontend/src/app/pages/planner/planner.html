@@ -1,0 +1,104 @@
+<section>
+  <h2>Plan a season</h2>
+
+  <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <div class="row">
+      <label>
+        Plan name
+        <input type="text" formControlName="name" placeholder="Year 1 spring" maxlength="60" />
+        @if (form.controls.name.touched && form.controls.name.invalid) {
+          <span class="field-error">Give the plan a name.</span>
+        }
+      </label>
+
+      <label>
+        Season
+        <select formControlName="season">
+          @for (season of seasons; track season) {
+            <option [value]="season">{{ labels[season] }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Planting day
+        <input type="number" formControlName="startDay" min="1" max="28" />
+        @if (form.controls.startDay.invalid) {
+          <span class="field-error">Day must be between 1 and 28.</span>
+        }
+      </label>
+    </div>
+
+    <h3>Crops in this plan</h3>
+    <div formArrayName="entries">
+      @for (entry of entries.controls; track entry; let i = $index) {
+        <div class="row entry" [formGroupName]="i">
+          <label>
+            Crop
+            <select formControlName="cropId">
+              <option [ngValue]="null" disabled>Choose a crop</option>
+              @for (crop of crops(); track crop.id) {
+                <option [ngValue]="crop.id">{{ crop.name }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            Tiles
+            <input type="number" formControlName="tiles" min="1" max="5000" />
+            @if (entry.get('tiles')?.invalid) {
+              <span class="field-error">Between 1 and 5000.</span>
+            }
+          </label>
+          <button type="button" class="secondary" (click)="removeEntry(i)" [attr.aria-label]="'Remove crop ' + (i + 1)">
+            Remove
+          </button>
+        </div>
+      } @empty {
+        <p class="hint">No crops yet. Add one below or pick from the ranking.</p>
+      }
+    </div>
+
+    <div class="actions">
+      <button type="button" class="secondary" (click)="addEntry()">+ Add crop</button>
+      <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save plan' }}</button>
+    </div>
+
+    @if (form.touched && entries.length === 0) {
+      <p class="field-error">Add at least one crop.</p>
+    }
+    @if (serverError(); as message) {
+      <p class="error" role="alert">{{ message }}</p>
+    }
+  </form>
+
+  <h3>Best crops from {{ labels[form.controls.season.value] }} day {{ form.controls.startDay.value }}</h3>
+  <p class="hint">Profit for one tile until the crop stops growing, replanting after each harvest.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Crop</th>
+          <th scope="col" class="num">Harvests</th>
+          <th scope="col" class="num">Profit</th>
+          <th scope="col" class="num">Gold per day</th>
+          <th scope="col" aria-label="Add to plan"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of ranking(); track row.cropId) {
+          <tr>
+            <th scope="row">{{ row.cropName }}</th>
+            <td class="num">{{ row.harvests }}</td>
+            <td class="num" [class.negative]="row.profit < 0">{{ row.profit | number }}g</td>
+            <td class="num">{{ row.profitPerDay | number: '1.2-2' }}</td>
+            <td><button type="button" class="secondary small" (click)="addEntry(row.cropId)">Add</button></td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5">No ranking available.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

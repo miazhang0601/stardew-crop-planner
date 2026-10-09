@@ -1,0 +1,74 @@
+<section>
+  <h2>Crops</h2>
+  <p class="hint">
+    These numbers are starting values. Edit a crop or add your own so the planner uses the prices from your game.
+  </p>
+
+  <div class="filters" role="group" aria-label="Filter by season">
+    <button type="button" [class.active]="selected() === null" (click)="load(null)">All</button>
+    @for (season of seasons; track season) {
+      <button type="button" [class.active]="selected() === season" (click)="load(season)">
+        {{ labels[season] }}
+      </button>
+    }
+    <button type="button" class="add" (click)="openForm(null)">+ Add crop</button>
+  </div>
+
+  @if (formOpen()) {
+    <app-crop-form [crop]="editing()" (saved)="onSaved()" (cancelled)="closeForm()" />
+  }
+
+  @if (error(); as message) {
+    <p class="error" role="alert">{{ message }}</p>
+  }
+
+  @if (loading()) {
+    <p>Loading crops…</p>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Crop</th>
+            <th scope="col">Seasons</th>
+            <th scope="col" class="num">Seed</th>
+            <th scope="col" class="num">Sells for</th>
+            <th scope="col" class="num">Days to grow</th>
+            <th scope="col" class="num">Regrows</th>
+            <th scope="col" class="num">Per harvest</th>
+            <th scope="col" aria-label="Actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (crop of crops(); track crop.id) {
+            <tr>
+              <th scope="row">{{ crop.name }}</th>
+              <td>
+                @for (season of crop.seasons; track season) {
+                  <span class="tag">{{ labels[season] }}</span>
+                }
+              </td>
+              <td class="num">{{ crop.seedPrice }}g</td>
+              <td class="num">{{ crop.sellPrice }}g</td>
+              <td class="num">{{ crop.growthDays }}</td>
+              <td class="num">{{ crop.regrowDays ? 'every ' + crop.regrowDays + ' days' : 'no' }}</td>
+              <td class="num">{{ crop.harvestYield }}</td>
+              <td class="row-actions">
+                <button type="button" class="secondary small" (click)="openForm(crop)" [attr.aria-label]="'Edit ' + crop.name">
+                  Edit
+                </button>
+                <button type="button" class="secondary small" (click)="remove(crop)" [attr.aria-label]="'Delete ' + crop.name">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8">No crops yet. Add one to get started.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
