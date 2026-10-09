@@ -4,6 +4,8 @@ A full stack web app that helps you decide what to plant in Stardew Valley. Pick
 
 Fan made project. Not affiliated with ConcernedApe or Stardew Valley.
 
+I Love Stardew Valley :)
+My Utopia
 ## Tech stack
 
 | Layer | Technology |
